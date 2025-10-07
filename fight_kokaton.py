@@ -4,6 +4,8 @@ import sys
 import time
 import pygame as pg
 
+
+
 NUM_OF_BOMBS = 5
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
@@ -140,6 +142,22 @@ class Bomb:
         screen.blit(self.img, self.rct)
 
 
+class Score:
+    """
+    score表示に関するクラス
+    """
+    def __init__(self):
+        self.num = 0
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30) #フォントの設定
+        self.img = self.fonto.render(f"score:{self.num}",0,(0,0,255)) #文字列Surfaceの生成
+        self.rct = self.img.get_rect()
+        self.rct.center = 100, 50 #文字列の中心座標
+    
+    def update(self, screen: pg.Surface):
+        self.img = self.fonto.render(f"score{self.num}:",0,(0,0,255)) #スコア表示の文字列生成
+        screen.blit(self.img,self.rct)
+        
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
@@ -153,6 +171,7 @@ def main():
     bombs = [Bomb((225,0,0),10)for _ in range(NUM_OF_BOMBS)]
 
     beam = None  # ゲーム初期化時にはビームは存在しない
+    score = Score() #Scoreインスタンスの生成
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -180,6 +199,7 @@ def main():
                 if beam.rct.colliderect(bomb.rct):
                     #ビームとボムの衝突判定
                     beam, bombs[i] = None, None 
+                    score.num += 1 #撃ち落としたスコアの計算
                     bird.change_img(6,screen)
         bombs = [bomb for bomb in bombs if bomb is not None]
 
@@ -189,6 +209,7 @@ def main():
             beam.update(screen)
         for bomb in bombs:   
             bomb.update(screen)
+        score.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
