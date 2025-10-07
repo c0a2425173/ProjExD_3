@@ -109,11 +109,8 @@ class Beam:
         if check_bound(self.rct) == (True, True):
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)    
-        
-        if self.rct.left < 0 or WIDTH < self.rct.right:
-            beams.pop()
-        if self.rct.top < 0 or HEIGHT < self.rct.bottom:
-            beams.pop()
+
+
 class Bomb:
     """
     爆弾に関するクラス
@@ -201,12 +198,15 @@ def main():
           
         for i, bomb in enumerate(bombs):
             for l,beam in enumerate(beams):
-                if beam.rct.colliderect(bomb.rct):
-                    #ビームとボムの衝突判定
-                    beams[l], bombs[i] = None, None 
-                    score.num += 1 #撃ち落としたスコアの計算
-                    bird.change_img(6,screen)
-        bombs = [bomb for bomb in bombs if bomb is not None]
+                if check_bound(beam.rct) != (True, True):
+                    beams.remove(beam)
+                    if beam.rct.colliderect(bomb.rct):
+                        #ビームとボムの衝突判定
+                        beams[l], bombs[i] = None, None 
+                        score.num += 1 #撃ち落としたスコアの計算
+                        bird.change_img(6,screen)
+                        bombs = [bomb for bomb in bombs if bomb is not None]
+                        beams = [beam for beam in beams if beam is not None]
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
